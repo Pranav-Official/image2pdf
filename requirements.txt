@@ -1,4 +1,4 @@
 Pillow==8.4.0
 Flask==2.2.3 
 Werkzeug==2.2.3 
-fpdf==2.7.3 
+fpdf2==2.7.3 
