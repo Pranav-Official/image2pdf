@@ -54,6 +54,7 @@ def upload():
             filenames.append(filename)
     # Call example function with uploads directory path
     images_to_pdf(os.path.abspath(app.config['UPLOAD_FOLDER']))
+    
     return render_template('download_pdf.html')
 
 
