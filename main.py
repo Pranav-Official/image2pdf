@@ -1,9 +1,9 @@
-
 from compress_images import images_to_pdf
 import os
 import shutil
 from flask import Flask, request, redirect, url_for, render_template, send_file
 from werkzeug.utils import secure_filename
+import threading
 
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
@@ -26,6 +26,8 @@ def example(uploads_dir):
 # Route for home page
 @app.route('/')
 def index():
+    if os.path.exists(app.config['UPLOAD_FOLDER']):
+        shutil.rmtree(os.path.abspath(app.config['UPLOAD_FOLDER']))
     return render_template('index.html')
 
 # Route for download page
@@ -46,11 +48,15 @@ def get_pdf():
 def upload():
     files = request.files.getlist('file')
     filenames = []
-    os.mkdir(os.path.abspath(app.config['UPLOAD_FOLDER']))
+    if not os.path.exists(app.config['UPLOAD_FOLDER']):
+        os.mkdir(os.path.abspath(app.config['UPLOAD_FOLDER']))
     for file in files:
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            t = threading.Thread(target=example, args=(os.path.join(app.config['UPLOAD_FOLDER'], filename),))
+            t.start()
+            t.join()
             filenames.append(filename)
     # Call example function with uploads directory path
     images_to_pdf(os.path.abspath(app.config['UPLOAD_FOLDER']))
@@ -59,6 +65,4 @@ def upload():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=os.getenv("PORT", default=5000))
-    app.run(debug=True)
-
+    app.run(debug=False, port=os.getenv("PORT", default=5000))
