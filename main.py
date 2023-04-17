@@ -1,6 +1,7 @@
 
 from compress_images import images_to_pdf
 import os
+import shutil
 from flask import Flask, request, redirect, url_for, render_template, send_file
 from werkzeug.utils import secure_filename
 
@@ -37,6 +38,7 @@ def get_pdf():
     # Replace 'example.pdf' with the name of your PDF file
     filename = 'compressed/compressed.pdf'
     return send_file(os.path.join(app.config['UPLOAD_FOLDER'], filename), as_attachment=True)
+    #shutil.rmtree(os.path.abspath(app.config['UPLOAD_FOLDER']))
 
 
 # Route for file upload
